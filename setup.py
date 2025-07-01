@@ -127,5 +127,13 @@ if __name__ == "__main__":
                 include_dirs=[np.get_include()],
                 define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
             )
+            ,
+            setuptools.Extension(
+                name="S15lib.g2lib.coinc4",
+                sources=["S15lib/g2lib/coinc4.cpp"],
+                include_dirs=[np.get_include()],
+                define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
+                #language="c++",
+            )
         ],
     )
