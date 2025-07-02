@@ -640,8 +640,7 @@ class TimestampTDC1(object):
             ):
         while self._com.in_waiting:
             self._com.readlines()  # empties buffer
-        if self.mode != "timestamp":
-            self.mode = "timestamp"
+        self.mode = "timestamp"
         if t_acq > 65.536:
             time_cmd = "time 0;"
         else:
