@@ -20,6 +20,7 @@ import serial
 import serial.tools.list_ports
 
 from ..g2lib import g2lib
+from ..g2lib.coinc4 import count_4coinc #, count_4coinc_indiv
 from . import serial_connection
 
 READEVENTS_PROG = expanduser("~") + "/programs/usbcntfpga/apps/readevents4a"
@@ -630,6 +631,34 @@ class TimestampTDC1(object):
         since reading from a file is time-consuming, we grab a couple at a go.
         """
         raise NotImplementedError()
+
+    def count_coinc4(
+            self,
+            t_acq: float,
+            coinc_window_ns: int,
+            **kwargs
+            ):
+        while self._com.in_waiting:
+            self._com.readlines()  # empties buffer
+        if self.mode != "timestamp":
+            self.mode = "timestamp"
+        if t_acq > 65.536:
+            time_cmd = "time 0;"
+        else:
+            if t_acq != self.int_time / 1000:
+                time_cmd = "time {:d};".format(int(t_acq * 1000))
+            else:
+                time_cmd = ""
+        cmd_begin_str = "INPKT;"
+        cmd_end_str = "counts?;"
+        cmd_str = cmd_begin_str + time_cmd + cmd_end_str
+        buf, tr = self._stream_response_into_buffer(cmd_str, t_acq)
+        # all above is copied from def get_timestamps
+        ts, events = self.read_timestamps_bin2(buf)
+        return count_4coinc(
+                ts.astype('uint64', copy = False), # unnescessary to allocate memory for casting int64->uint64
+                events.astype('uint32'),
+                coinc_window_ns)
 
 
 # Assign alias to new naming scheme
