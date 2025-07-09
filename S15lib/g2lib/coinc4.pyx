@@ -12,8 +12,7 @@ ctypedef pair[unsigned long long,unsigned int] event2
 
 cdef extern from *:
     """
-    typedef unsigned long long ull;
-    using event = std::pair<ull,uint>;
+    using event = std::pair<unsigned long long,unsigned int>;
     using pq = std::priority_queue<event, std::vector<event>, std::greater<event>>;
     """
     cdef cppclass pq:
