@@ -8,9 +8,7 @@
 from libcpp.pair cimport pair
 from libcpp.queue cimport queue
 
-ctypedef unsigned long long ull
-ctypedef unsigned int uint
-ctypedef pair[ull,uint] event2
+ctypedef pair[unsigned long long,unsigned int] event2
 
 cdef extern from *:
     """
@@ -26,8 +24,8 @@ cdef extern from *:
         event2& top()
 
 cdef struct s_event:
-    ull t
-    uint p
+    unsigned long long t
+    unsigned int p
 ctypedef s_event event
 
 cdef int get_window4coincs(int[4] counts, int idx) noexcept:
@@ -42,15 +40,16 @@ cdef int get_window4coincs(int[4] counts, int idx) noexcept:
         Cython optimizes the if-elif chain away as a switch statement.
     """
     if idx == 0:
-        return counts[1] * counts[2] * counts[3]
+        return counts[2] * counts[3]
     elif idx == 1:
-        return counts[0] * counts[2] * counts[3]
+        return 0
+    #     return counts[0] * counts[2] * counts[3]
     elif idx == 2:
-        return counts[0] * counts[1] * counts[3]
+        return counts[0] * counts[3]
     else:
-        return counts[0] * counts[1] * counts[2]
+        return counts[0] * counts[2]
 
-cpdef int count_4coinc(ull[:] ts, uint[:] ps, int coincw_ns):
+cpdef int count_4coinc(unsigned long long[:] ts, unsigned int[:] ps, int coincw_ns):
     """Returns number of 4-fold coincidences within coincidence window.
 
     The time complexity of this algorithm is O(N) amortized in the number of
@@ -76,8 +75,8 @@ cpdef int count_4coinc(ull[:] ts, uint[:] ps, int coincw_ns):
         detection patterns can be arbitrary adjusted using numpy in Python.
     """
     cdef int i, j, total = 0, length = len(ts)
-    cdef ull t
-    cdef uint p
+    cdef unsigned long long t
+    cdef unsigned int p
     cdef int[4] ch_counts = [0, 0, 0, 0]
     cdef queue[event] window
     for j in range(length):
@@ -102,7 +101,7 @@ cpdef int count_4coinc(ull[:] ts, uint[:] ps, int coincw_ns):
         window.push([t, p])
     return total
 
-cpdef int count_4coinc_indiv(ull[:] ts1, ull[:] ts2, ull[:] ts3, ull[:] ts4, int coincw_ns):
+cpdef int count_4coinc_indiv(unsigned long long[:] ts1, unsigned long long[:] ts2, unsigned long long[:] ts3, unsigned long long[:] ts4, int coincw_ns):
     """Returns number of 4-fold coincidences within coincidence window.
 
     Similar to 'count_4coinc', with the exception of the timestamps in separated
@@ -122,8 +121,8 @@ cpdef int count_4coinc_indiv(ull[:] ts1, ull[:] ts2, ull[:] ts3, ull[:] ts4, int
         30% of the execution speed of 'count_4coinc'.
     """
     cdef int i, j, total = 0
-    cdef ull t
-    cdef uint p = 0
+    cdef unsigned long long t
+    cdef unsigned int p = 0
     cdef int[4] ch_counts = [0, 0, 0, 0]
     cdef queue[event] window
 
