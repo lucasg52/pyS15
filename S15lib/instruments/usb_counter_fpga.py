@@ -645,10 +645,7 @@ class TimestampTDC1(object):
         if t_acq > 65.536:
             time_cmd = "time 0;"
         else:
-            if t_acq != self.int_time / 1000:
-                time_cmd = "time {:d};".format(int(t_acq * 1000))
-            else:
-                time_cmd = ""
+            time_cmd = "time {:d};".format(int(t_acq * 1000))
         cmd_begin_str = "INPKT;"
         cmd_end_str = "counts?;"
         cmd_str = cmd_begin_str + time_cmd + cmd_end_str
