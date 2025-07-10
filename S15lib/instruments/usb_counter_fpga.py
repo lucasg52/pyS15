@@ -552,6 +552,9 @@ class TimestampTDC1(object):
             uint_list >> 5
         ) << 1  # 27 timing info bits out of 32, 2ns per lsb
         (neg_diff_list,) = (np.diff(raw_ts_list) < (-1 << 25)).nonzero()
+        if len(neg_diff_list) > 16:
+            raise RuntimeError(f"Excessive number of timestamp rollovers during event counting: {len(neg_diff_list)}\n"
+                                "Data may be misalligned")
         for i in range(len(neg_diff_list)):
             raw_ts_list[neg_diff_list[i] + 1 :] += 1 << 28  # add rollovers
         event_channel_list = uint_list & 0xF
