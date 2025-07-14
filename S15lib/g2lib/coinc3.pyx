@@ -8,6 +8,7 @@ cdef struct CoincVec:
     coinccount_t coinc3
     coinccount_t paircnt_1_3
     coinccount_t paircnt_1_4
+    coinccount_t gatecnt
     # coinccount_t paircnt_3_4
 # 
 # cdef CoincVec get_windowcoincs(eventcount_t[4] counts, int idx):
@@ -38,7 +39,7 @@ cdef struct CoincVec:
 
 cpdef CoincVec count_3coinc(uint64[:] ts, uint32[:] ps, int coincw_ns):
     cdef int i, j, length = len(ts)
-    cdef CoincVec totals = CoincVec(0,0,0)
+    cdef CoincVec totals = CoincVec(0,0,0,0)
     cdef uint64 t
     cdef uint32 p
     cdef uint64 cutoff
@@ -63,6 +64,7 @@ cpdef CoincVec count_3coinc(uint64[:] ts, uint32[:] ps, int coincw_ns):
         for i in range(4):
             if i != 1 and (p & (1 << i) != 0):
                 if i == 0:
+                    totals.gatecnt += 1
                     totals.paircnt_1_3 += ch_counts[2]
                     totals.paircnt_1_4 += ch_counts[3]
                     totals.coinc3 += ch_counts[2] * ch_counts[3]
