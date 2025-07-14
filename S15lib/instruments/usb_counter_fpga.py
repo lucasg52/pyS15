@@ -645,18 +645,7 @@ class TimestampTDC1(object):
         otherwise returns a dict with keys "coinc3", "paircnt_1_3", "paircnt_1_4"
         and int values
         """
-        while self._com.in_waiting:
-            self._com.readlines()  # empties buffer
-        if t_acq > 65.536:
-            time_cmd = "time 0;"
-        else:
-            time_cmd = "time {:d};".format(int(t_acq * 1000))
-        cmd_begin_str = "INPKT;"
-        cmd_end_str = "counts?;"
-        cmd_str = cmd_begin_str + time_cmd + cmd_end_str
-        buf, tr = self._stream_response_into_buffer(cmd_str, t_acq)
-        # all above is copied from def get_timestamps
-        ts, events = self.read_timestamps_bin2(buf)
+        ts, events = self.get_timestamps(t_acq, highcount = True, legacy = False)
         if coinc3:
             return count_3coinc(
                     ts.astype('uint64', copy = False), # unnescessary to allocate memory for casting int64->uint64
